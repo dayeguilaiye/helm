@@ -447,7 +447,9 @@ func (c *Client) Update(original, target ResourceList, force bool) (*Result, err
 		}
 		if err := deleteResource(info, metav1.DeletePropagationBackground); err != nil {
 			c.Log("Failed to delete %q, err: %s", info.ObjectName(), err)
-			updateErrors = append(updateErrors, err.Error())
+			if !apierrors.IsNotFound(err) {
+				updateErrors = append(updateErrors, err.Error())
+			}
 			continue
 		}
 		res.Deleted = append(res.Deleted, info)
